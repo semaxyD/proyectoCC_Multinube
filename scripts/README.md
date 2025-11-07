@@ -1,224 +1,430 @@
-# Scripts de Automatización# Scripts de Automatización# Scripts de Automatización
+# Scripts de Automatización# Scripts de Automatización
 
 
 
-Esta carpeta contiene scripts **automáticos** que son ejecutados durante el aprovisionamiento de infraestructura.
+Esta carpeta contiene scripts que **se ejecutan automáticamente** durante el despliegue de infraestructura.Esta carpeta contiene scripts que **se ejecutan automáticamente** durante el despliegue de infraestructura - son utilizados por Terraform y Vagrant.
 
 
 
-## 📜 Scripts Disponibles> ⚠️ **IMPORTANTE**: Estos scripts son **herramientas manuales** para facilitar tareas específicas.> ⚠️ **IMPORTANTE**: Estos scripts son **herramientas manuales** para facilitar tareas específicas.
+---### 1. `rancher-setup.sh`> > 
 
 
 
-### 1. `rancher-setup.sh`> > 
+## 🔧 Scripts Disponibles
 
 
 
-Instala Docker y despliega Rancher v2.8.3 en Ubuntu 22.04 LTS.> **Excepción**: El script `create-k8sLocal.sh` SÍ es ejecutado automáticamente por Vagrant al hacer `vagrant up` en `terraform/local/`.> **Excepción**: El script `create-k8sLocal.sh` SÍ es ejecutado automáticamente por Vagrant al hacer `vagrant up` en `terraform/local/`.
+### 1. `rancher-setup.sh`Instala Docker y despliega Rancher v2.8.3 en Ubuntu 22.04 LTS.> **Excepción**: El script `create-k8sLocal.sh` SÍ es ejecutado automáticamente por Vagrant al hacer `vagrant up` en `terraform/local/`.> **Excepción**: El script `create-k8sLocal.sh` SÍ es ejecutado automáticamente por Vagrant al hacer `vagrant up` en `terraform/local/`.
 
 
 
-> ✅ **Ejecutado automáticamente** por Terraform mediante `cloud-init.yaml` al crear la VM de Rancher.
+**Propósito**: Instala Docker y despliega Rancher v2.8.3 en Ubuntu 22.04 LTS.
 
 
 
-**Qué hace:**Esta carpeta contiene scripts para facilitar el despliegue y gestión de la infraestructura multinube.Esta carpeta contiene scripts para facilitar el despliegue y gestión de la infraestructura multinube.
+**Usado por**: Terraform - aprovisionamiento de la VM de Rancher mediante `cloud-init.yaml`> ✅ **Ejecutado automáticamente** por Terraform mediante `cloud-init.yaml` al crear la VM de Rancher.
 
-- Instala dependencias del sistema
 
-- Instala Docker
 
-- Despliega Rancher en contenedor
+**Ejecución**: ✅ **Automática** cuando ejecutas `terraform apply` en `terraform/azure/rancher-server/`
 
-- Configura reinicio automático## 🔍 ¿Cuándo usar estos scripts?## 🔍 ¿Cuándo usar estos scripts?
+
+
+**Qué hace:****Qué hace:**Esta carpeta contiene scripts para facilitar el despliegue y gestión de la infraestructura multinube.Esta carpeta contiene scripts para facilitar el despliegue y gestión de la infraestructura multinube.
+
+- Instala dependencias del sistema (curl, vim, etc.)
+
+- Instala Docker- Instala dependencias del sistema
+
+- Despliega Rancher en contenedor (puertos 80 y 443)
+
+- Configura reinicio automático- Instala Docker
 
 - Verifica que Rancher esté healthy
 
-- Guarda bootstrap password
+- Muestra IP de acceso y bootstrap password- Despliega Rancher en contenedor
 
 
+
+**Flujo de ejecución:**- Configura reinicio automático## 🔍 ¿Cuándo usar estos scripts?## 🔍 ¿Cuándo usar estos scripts?
+
+```
+
+terraform apply (rancher-server)- Verifica que Rancher esté healthy
+
+    ↓
+
+cloud-init.yaml ejecuta rancher-setup.sh- Guarda bootstrap password
+
+    ↓
+
+Rancher queda disponible en https://<RANCHER_IP>
+
+```
 
 **No necesitas ejecutar este script manualmente** - Terraform lo hace por ti.| Script | Cuándo usarlo | Automático? || Script | Cuándo usarlo | Automático? |
 
-
-
-**Uso manual** (solo si NO usas Terraform):|--------|---------------|-------------||--------|---------------|-------------|
-
-```bash
-
-chmod +x rancher-setup.sh| `rancher-setup.sh` | Solo si NO usas Terraform (instalación manual) | ❌ Manual || `rancher-setup.sh` | Solo si NO usas Terraform (instalación manual) | ❌ Manual |
-
-./rancher-setup.sh
-
-```| `create-k8sLocal.sh` | Ejecutado por Vagrant automáticamente | ✅ Automático con Vagrant || `create-k8sLocal.sh` | Ejecutado por Vagrant automáticamente | ✅ Automático con Vagrant |
-
-
-
----| `register-cluster.sh` | Después de crear cada cluster | ❌ Manual || `register-cluster.sh` | Después de crear cada cluster | ❌ Manual |
+---
 
 
 
 ### 2. `create-k8sLocal.sh`
 
+**Uso manual** (solo si NO usas Terraform):|--------|---------------|-------------||--------|---------------|-------------|
+
+**Propósito**: Instala Minikube y crea un cluster Kubernetes local llamado `k8sLocal`.
+
+```bash
+
+**Usado por**: Vagrant - aprovisionamiento de la VM local mediante `Vagrantfile`
+
+chmod +x rancher-setup.sh| `rancher-setup.sh` | Solo si NO usas Terraform (instalación manual) | ❌ Manual || `rancher-setup.sh` | Solo si NO usas Terraform (instalación manual) | ❌ Manual |
+
+**Ejecución**: ✅ **Automática** cuando ejecutas `vagrant up` en `terraform/local/`
+
+./rancher-setup.sh
+
+**Qué hace:**
+
+- Instala Docker, kubectl y Minikube```| `create-k8sLocal.sh` | Ejecutado por Vagrant automáticamente | ✅ Automático con Vagrant || `create-k8sLocal.sh` | Ejecutado por Vagrant automáticamente | ✅ Automático con Vagrant |
+
+- Crea cluster Minikube llamado `k8sLocal`
+
+- Configura kubectl para usar el contexto
+
+- Verifica que los nodos estén Ready
+
+- Ejecuta un test básico (nginx pod)---| `register-cluster.sh` | Después de crear cada cluster | ❌ Manual || `register-cluster.sh` | Después de crear cada cluster | ❌ Manual |
 
 
-Crea un cluster Kubernetes local con Minikube en Ubuntu.### 💡 Notas:### 💡 Notas:
+
+**Flujo de ejecución:**
+
+```
+
+vagrant up (terraform/local/)### 2. `create-k8sLocal.sh`
+
+    ↓
+
+Vagrantfile provisioner ejecuta create-k8sLocal.sh
+
+    ↓
+
+VM con Minikube lista para registrar en RancherCrea un cluster Kubernetes local con Minikube en Ubuntu.### 💡 Notas:### 💡 Notas:
+
+```
 
 
+
+---
 
 > ✅ **Ejecutado automáticamente** por Vagrant al hacer `vagrant up` en `terraform/local/`.
 
+### 3. `register-cluster.sh`
 
+
+
+**Propósito**: Simplifica el registro de clusters en Rancher mediante token.
 
 **Qué hace:**- **`rancher-setup.sh`**: NO es necesario si usas Terraform (ya incluido en `cloud-init.yaml`)- **`rancher-setup.sh`**: NO es necesario si usas Terraform (ya incluido en `cloud-init.yaml`)
 
+**Usado por**: TÚ (manual) - después de crear cada cluster (AKS, EKS, k8sLocal)
+
 - Instala Docker
+
+**Ejecución**: ❌ **Manual** - ejecutas tú después de obtener el token desde Rancher UI
 
 - Instala kubectl- **`create-k8sLocal.sh`**: Se ejecuta automáticamente al hacer `vagrant up`- **`create-k8sLocal.sh`**: Se ejecuta automáticamente al hacer `vagrant up`
 
-- Instala Minikube
+**Uso:**
 
-- Crea cluster llamado `k8sLocal`- **`register-cluster.sh`**: Simple y claro - solo requiere copiar token desde Rancher UI- **`register-cluster.sh`**: Simple y claro - solo requiere copiar token desde Rancher UI
+```bash- Instala Minikube
+
+cd scripts
+
+./register-cluster.sh <RANCHER_IP> <TOKEN> <CLUSTER_NAME>- Crea cluster llamado `k8sLocal`- **`register-cluster.sh`**: Simple y claro - solo requiere copiar token desde Rancher UI- **`register-cluster.sh`**: Simple y claro - solo requiere copiar token desde Rancher UI
+
+```
 
 - Configura kubectl
 
-- Verifica que el cluster esté Ready
+**Ejemplo:**
+
+```bash- Verifica que el cluster esté Ready
+
+./register-cluster.sh 20.185.23.45 abc123xyz k8s-azure
+
+```
 
 
 
-**No necesitas ejecutar este script manualmente** - Vagrant lo hace por ti.## 📜 Scripts Disponibles## 📜 Scripts Disponibles
+**Cómo obtener el token:****No necesitas ejecutar este script manualmente** - Vagrant lo hace por ti.## 📜 Scripts Disponibles## 📜 Scripts Disponibles
 
+1. Accede a Rancher UI
 
+2. Ve a **Clusters** → **Import Existing** → **Generic**
+
+3. Copia el token del comando proporcionado (la parte después de `/v3/import/`)
 
 **Uso manual** (solo para debugging):
 
+---
+
 ```bash
+
+## 📋 Resumen: ¿Cuáles se ejecutan automáticamente?
 
 chmod +x create-k8sLocal.sh### 1. `rancher-setup.sh`### 1. `rancher-setup.sh`
 
-./create-k8sLocal.sh
+| Script | ¿Automático? | Usado por | Cuándo |
 
-```
+|--------|--------------|-----------|--------|./create-k8sLocal.sh
+
+| `rancher-setup.sh` | ✅ Sí | Terraform (cloud-init) | Durante `terraform apply` de rancher-server |
+
+| `create-k8sLocal.sh` | ✅ Sí | Vagrant (provisioner) | Durante `vagrant up` |```
+
+| `register-cluster.sh` | ❌ No | Usuario (manual) | Después de crear cada cluster |
 
 
+
+---
 
 ---Instala Docker y despliega Rancher v2.8.3 en Ubuntu 22.04 LTS.Instala Docker y despliega Rancher v2.8.3 en Ubuntu 22.04 LTS.
 
-
-
-## 🔧 Funcionamiento
-
-
-
-### Script 1: `rancher-setup.sh`> ⚠️ **No necesario si usas Terraform** - Terraform ya hace esto automáticamente con `cloud-init.yaml`**Uso:**
+## 🎯 Flujo Completo de Automatización
 
 
 
-**¿Cuándo se ejecuta?**```bash
+### Paso 1: Desplegar Rancher (Automático)
 
-```bash
+```bash## 🔧 Funcionamiento
 
-cd terraform/azure/rancher-server**Uso:**chmod +x rancher-setup.sh
+cd terraform/azure/rancher-server
 
 terraform apply
 
-``````bash./rancher-setup.sh
+# ↓ Terraform usa cloud-init.yaml
 
+# ↓ cloud-init ejecuta rancher-setup.sh automáticamente### Script 1: `rancher-setup.sh`> ⚠️ **No necesario si usas Terraform** - Terraform ya hace esto automáticamente con `cloud-init.yaml`**Uso:**
 
-
-Durante `terraform apply`, el archivo `cloud-init.yaml` incluye todos los comandos de este script, ejecutándolos automáticamente al crear la VM.chmod +x rancher-setup.sh```
-
-
-
-**Resultado:**./rancher-setup.sh
-
-- VM con Rancher corriendo en Docker
-
-- Accesible en `https://<VM_IP>````**Qué hace:**
-
-- Bootstrap password guardado en `/tmp/rancher-bootstrap-password.txt`
-
-- Instala dependencias (curl, vim, etc.)
-
----
-
-**Qué hace:**- Instala Docker
-
-### Script 2: `create-k8sLocal.sh`
-
-- Instala dependencias (curl, vim, etc.)- Despliega Rancher en contenedor
-
-**¿Cuándo se ejecuta?**
-
-```bash- Instala Docker- Verifica que Rancher esté healthy
-
-cd terraform/local
-
-vagrant up- Despliega Rancher en contenedor- Muestra IP de acceso y bootstrap password
+# ✅ Rancher disponible en https://<IP>
 
 ```
 
-- Verifica que Rancher esté healthy
 
-Durante `vagrant up`, el `Vagrantfile` ejecuta este script como provisioner.
 
-- Muestra IP de acceso y bootstrap password**Variables de entorno:**
+### Paso 2: Desplegar AKS (Semi-automático)**¿Cuándo se ejecuta?**```bash
 
-**Resultado:**
+```bash
 
-- VM Ubuntu con Minikube instalado```bash
+cd terraform/azure/aks-cluster```bash
 
-- Cluster `k8sLocal` corriendo
+terraform apply
 
-- kubectl configurado**Variables de entorno:**# Cambiar versión de Rancher
+# ✅ Cluster AKS listo (sin scripts adicionales)cd terraform/azure/rancher-server**Uso:**chmod +x rancher-setup.sh
 
-- Listo para registrarse en Rancher
+```
 
-```bashRANCHER_VERSION=v2.8.4 ./rancher-setup.sh
+terraform apply
+
+### Paso 3: Desplegar VM local (Automático)
+
+```bash``````bash./rancher-setup.sh
+
+cd terraform/local
+
+vagrant up
+
+# ↓ Vagrant ejecuta Vagrantfile
+
+# ↓ Provisioner ejecuta create-k8sLocal.sh automáticamenteDurante `terraform apply`, el archivo `cloud-init.yaml` incluye todos los comandos de este script, ejecutándolos automáticamente al crear la VM.chmod +x rancher-setup.sh```
+
+# ✅ Minikube listo en VM local
+
+```
+
+
+
+### Paso 4: Crear EKS (Manual desde AWS Console)**Resultado:**./rancher-setup.sh
+
+```bash
+
+# Seguir guía: aws-manual/eks-setup-guide.md- VM con Rancher corriendo en Docker
+
+# ✅ Cluster EKS listo
+
+```- Accesible en `https://<VM_IP>````**Qué hace:**
+
+
+
+### Paso 5: Registrar clusters (Manual con ayuda de script)- Bootstrap password guardado en `/tmp/rancher-bootstrap-password.txt`
+
+```bash
+
+cd scripts- Instala dependencias (curl, vim, etc.)
+
+
+
+# Registrar AKS---
+
+az aks get-credentials -g rg-k8s-azure -n k8s-azure
+
+./register-cluster.sh <RANCHER_IP> <TOKEN> k8s-azure**Qué hace:**- Instala Docker
+
+
+
+# Registrar EKS### Script 2: `create-k8sLocal.sh`
+
+aws eks update-kubeconfig --name rancher-eks-cluster --region us-east-1
+
+./register-cluster.sh <RANCHER_IP> <TOKEN> rancher-eks-cluster- Instala dependencias (curl, vim, etc.)- Despliega Rancher en contenedor
+
+
+
+# Registrar k8sLocal**¿Cuándo se ejecuta?**
+
+kubectl config use-context k8sLocal
+
+./register-cluster.sh <RANCHER_IP> <TOKEN> k8sLocal```bash- Instala Docker- Verifica que Rancher esté healthy
+
+
+
+# ✅ Todos los clusters visibles desde Rancher UIcd terraform/local
+
+```
+
+vagrant up- Despliega Rancher en contenedor- Muestra IP de acceso y bootstrap password
 
 ---
 
-# Cambiar versión de Rancher```
+```
 
-## 📝 Notas Importantes
+## ⚠️ Aclaración Importante
 
-RANCHER_VERSION=v2.8.4 ./rancher-setup.sh
+- Verifica que Rancher esté healthy
+
+**Estos scripts NO se ejecutan manualmente por ti** (excepto `register-cluster.sh`). Son utilizados por las herramientas de automatización:
+
+Durante `vagrant up`, el `Vagrantfile` ejecuta este script como provisioner.
+
+- ✅ `rancher-setup.sh` → **Terraform lo ejecuta** automáticamente vía cloud-init
+
+- ✅ `create-k8sLocal.sh` → **Vagrant lo ejecuta** automáticamente vía provisioner- Muestra IP de acceso y bootstrap password**Variables de entorno:**
+
+- ❌ `register-cluster.sh` → **Tú lo ejecutas** manualmente (es el único)
+
+**Resultado:**
+
+Si ves estos scripts en la carpeta, no significa que debas ejecutarlos. Son parte de la infraestructura como código y se ejecutan solos durante el aprovisionamiento.
+
+- VM Ubuntu con Minikube instalado```bash
+
+---
+
+- Cluster `k8sLocal` corriendo
+
+## 🐛 Troubleshooting
+
+- kubectl configurado**Variables de entorno:**# Cambiar versión de Rancher
+
+### Rancher no arranca después de `terraform apply`
+
+- Listo para registrarse en Rancher
+
+```bash
+
+# SSH a la VM```bashRANCHER_VERSION=v2.8.4 ./rancher-setup.sh
+
+ssh -i terraform/azure/rancher-server/ssh_keys/rancher_key.pem azureuser@<RANCHER_IP>
+
+---
+
+# Ver logs de cloud-init (incluye ejecución de rancher-setup.sh)
+
+sudo cat /var/log/cloud-init-output.log# Cambiar versión de Rancher```
+
+
+
+# Ver estado de Rancher## 📝 Notas Importantes
+
+sudo docker ps
+
+sudo docker logs rancherRANCHER_VERSION=v2.8.4 ./rancher-setup.sh
+
+```
 
 ### ⚠️ Estos scripts SON automáticos
 
+### Minikube no arranca después de `vagrant up`
+
 ```---
 
-A diferencia de otras herramientas de configuración, **NO necesitas ejecutar estos scripts manualmente**:
+```bash
+
+# SSH a la VMA diferencia de otras herramientas de configuración, **NO necesitas ejecutar estos scripts manualmente**:
+
+vagrant ssh
 
 
 
-- ✅ `rancher-setup.sh` → Ejecutado por Terraform (cloud-init)
+# Ver logs del script (ejecutado por Vagrant)
 
-- ✅ `create-k8sLocal.sh` → Ejecutado por Vagrant---### 2. `create-k8sLocal.sh`
+cat /var/log/cloud-init-output.log- ✅ `rancher-setup.sh` → Ejecutado por Terraform (cloud-init)
 
 
+
+# Verificar Minikube- ✅ `create-k8sLocal.sh` → Ejecutado por Vagrant---### 2. `create-k8sLocal.sh`
+
+minikube status -p k8sLocal
+
+kubectl get nodes
+
+```
 
 ### 🔗 Registro de Clusters en Rancher
 
-
-
-El registro de clusters se hace **manualmente desde la UI de Rancher**:### 2. `create-k8sLocal.sh`Crea un cluster Kubernetes local con Minikube.
+### Script de registro se queda esperando
 
 
 
-1. Acceder a Rancher UI
+```bash
 
-2. **Clusters** → **Import Existing** → **Generic**
+# Interrumpir con Ctrl+CEl registro de clusters se hace **manualmente desde la UI de Rancher**:### 2. `create-k8sLocal.sh`Crea un cluster Kubernetes local con Minikube.
 
-3. Nombrar el clusterCrea un cluster Kubernetes local con Minikube.**Uso:**
+# Ver logs manualmente para diagnosticar
 
-4. Copiar comando proporcionado
+kubectl get pods -n cattle-system
 
-5. Ejecutar en CloudShell/terminal del cluster```bash
+kubectl logs -f -n cattle-system <pod-name>
+
+```1. Acceder a Rancher UI
 
 
+
+---2. **Clusters** → **Import Existing** → **Generic**
+
+
+
+## 📚 Referencias3. Nombrar el clusterCrea un cluster Kubernetes local con Minikube.**Uso:**
+
+
+
+- [Terraform cloud-init](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config)4. Copiar comando proporcionado
+
+- [Vagrant Provisioning](https://www.vagrantup.com/docs/provisioning)
+
+- [Rancher Installation](https://rancher.com/docs/rancher/v2.8/en/installation/)5. Ejecutar en CloudShell/terminal del cluster```bash
+
+- [Minikube Start](https://minikube.sigs.k8s.io/docs/start/)
+
+
+
+---
 
 Ver documentación completa en:> ✅ **Ejecutado automáticamente por Vagrant** al hacer `vagrant up`chmod +x create-k8sLocal.sh
+
+**Última actualización**: Noviembre 2025
 
 - [`README.md`](../README.md) - Guía general
 

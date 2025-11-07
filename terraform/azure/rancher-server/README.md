@@ -69,15 +69,17 @@ Outputs disponibles:
    ```
 4. Configurar nueva contraseña (recomendado: `proyectoCCG1`)
 
-## Personalización
+## Variables Disponibles
 
-Puedes crear un archivo `terraform.tfvars` para personalizar variables:
+Las siguientes variables se pueden modificar editando directamente el archivo `variables.tf` si necesitas personalización:
 
 ```hcl
 location            = "East US 2"
 vm_size             = "Standard_D4s_v3"  # 4 vCPU, 16GB RAM
 rancher_version     = "v2.8.3"
 ```
+
+> 💡 **Nota**: Los valores por defecto están optimizados para Azure for Students. Si necesitas cambiarlos, edita `variables.tf` directamente.
 
 ## Variables Disponibles
 

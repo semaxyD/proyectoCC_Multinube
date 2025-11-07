@@ -79,9 +79,7 @@ cd ../../local && vagrant up
 | **AKS Cluster** | Terraform | ✅ Totalmente automático |
 | **EKS Cluster** | AWS Console | ❌ Manual (limitación AWS Academy) |
 | **VM Local (Vagrant)** | Vagrant + script | ✅ Automático con `vagrant up` |
-| **Registro en Rancher** | Script helper | ⚠️ Semi-manual (copiar token) |
-
-> 💡 **Nota sobre scripts**: Los scripts en `scripts/` son **herramientas manuales** para facilitar tareas. El único que se ejecuta automáticamente es `create-k8sLocal.sh` cuando usas Vagrant.
+| **Registro en Rancher** | UI de rancher | ❌ Manual (mas simple que consumir API de rancher via script) |
 
 ## �🚀 Requisitos Previos
 
@@ -383,19 +381,10 @@ Proyecto desarrollado como parte del curso de Computación en la Nube - 2025
 
 ### Integrantes
 
-- **Tu Nombre** - Infraestructura base y automatización con Terraform
-- *(Agregar otros integrantes)*
+- **Sebastian Marinez** - Infraestructura base y automatización con Terraform
+- **Andres Higuera** - Despliegue de la app en los diferentes clusters disponibles
+- **Nicolas Gonzales** - Configuración y pruebas del balanceador de carga
+- **Santiago Cortes** - Monitoreo de la app y la infraestructura que la respalda
 
-## 📝 Licencia
-
-Este proyecto es con fines educativos.
-
-## 🙏 Agradecimientos
-
-- Profesor y equipo docente del curso
-- Comunidad de Rancher
-- Documentación de Azure, AWS y Kubernetes
-
----
 
 **⭐ Si este proyecto te fue útil, considera darle una estrella en GitHub!**

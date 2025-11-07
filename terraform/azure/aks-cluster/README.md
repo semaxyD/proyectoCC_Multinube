@@ -72,19 +72,9 @@ kubectl get pods -n kube-system
 kubectl version
 ```
 
-## Personalización
-
-Crear archivo `terraform.tfvars`:
-
-```hcl
-cluster_name       = "k8s-azure"
-location           = "East US 2"
-node_count         = 3
-node_vm_size       = "Standard_D2s_v3"
-kubernetes_version = "1.28"
-```
-
 ## Variables Disponibles
+
+Las siguientes variables se pueden modificar editando directamente el archivo `variables.tf` si necesitas personalización:
 
 | Variable | Descripción | Default |
 |----------|-------------|---------|
@@ -94,6 +84,8 @@ kubernetes_version = "1.28"
 | `node_count` | Número de nodos | `2` |
 | `node_vm_size` | Tamaño de VMs | `Standard_B2s` |
 | `kubernetes_version` | Versión de K8s | `1.28` |
+
+> 💡 **Nota**: Los valores por defecto están optimizados para Azure for Students. Si necesitas cambiarlos, edita `variables.tf` directamente.
 
 ## Arquitectura
 
@@ -141,7 +133,13 @@ curl --insecure -sfL https://<RANCHER_IP>/v3/import/<TOKEN>.yaml | kubectl apply
 kubectl get pods -n cattle-system
 ```
 
-## Monitoreo
+---
+
+## 📚 Pasos Adicionales (Opcionales)
+
+Los siguientes pasos son opcionales y no forman parte de esta fase del proyecto. Se incluyen por si deseas explorar funcionalidades adicionales de AKS.
+
+### Monitoreo
 
 El cluster incluye Azure Monitor integrado:
 
@@ -220,14 +218,9 @@ terraform destroy
 
 **⚠️ ADVERTENCIA**: Esto eliminará el cluster y TODOS sus recursos.
 
-## Próximos Pasos
+---
 
-1. Registrar cluster en Rancher
-2. Desplegar aplicaciones de prueba
-3. Configurar Ingress Controllers
-4. Configurar almacenamiento persistente
-
-## Notas
+## 📝 Notas
 
 - El cluster usa **System Assigned Identity** para gestión de recursos
 - Azure Monitor está habilitado por defecto

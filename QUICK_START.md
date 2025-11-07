@@ -153,12 +153,18 @@ El cluster debe aparecer como **Active** en Rancher UI en 2-3 minutos.
 ## 🎯 Lo que NO necesitas hacer manualmente
 
 ❌ **NO** ejecutar scripts en `scripts/` - Terraform y Vagrant los ejecutan automáticamente
+
 ❌ **NO** instalar Docker en Rancher VM - cloud-init lo hace automáticamente
+
 ❌ **NO** instalar Minikube en VM local - Vagrant lo hace automáticamente
+
 ❌ **NO** configurar networking - Terraform lo configura automáticamente
 
+
 ✅ **SÍ** crear cluster EKS manualmente (limitación AWS Academy)
+
 ✅ **SÍ** registrar clusters desde Rancher UI (mismo proceso para todos)
+
 
 ---
 
