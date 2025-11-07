@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Box base de Ubuntu
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.hostname = "minikube-vm"
+
+  # Configuración de red - bridge a tu adaptador WiFi
+  # Ajusta el nombre del adaptador según tu sistema
+  config.vm.network "public_network", bridge: [
+    "MediaTek Wi-Fi SE MT7902",
+    "Intel(R) Ethernet Connection",
+    "Realtek PCIe GbE Family Controller"
+  ]
+
+  # Configuración de recursos
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "minikube-local-cluster"
+    vb.memory = "4096"
+    vb.cpus = 2
+    
+    # Habilitar virtualización anidada para Minikube
+    vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+  end
+
+  # Provisionar con el script de creación de Minikube
+  config.vm.provision "shell", path: "../../scripts/create-k8sLocal.sh"
+
+  # Mensaje informativo
+  config.vm.post_up_message = <<-MSG
+    ===============================================
+    ✅ VM de Minikube creada exitosamente!
+    ===============================================
+    
+    Para conectarte a la VM:
+      vagrant ssh
+    
+    Para verificar el cluster:
+      vagrant ssh -c "kubectl get nodes"
+    
+    Para detener la VM:
+      vagrant halt
+    
+    Para eliminar la VM:
+      vagrant destroy
+    ===============================================
+  MSG
+end

@@ -1,0 +1,39 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+
+# Kubernetes config files
+kubeconfig*
+*.kubeconfig
+
+# Sensitive files
+*.pem
+*.key
+ssh_keys/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Backup files
+*.backup
+*~
+
+# Local testing
+test/
+tmp/

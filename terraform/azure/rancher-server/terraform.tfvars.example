@@ -1,0 +1,22 @@
+# Ejemplo de archivo terraform.tfvars para Rancher Server
+# Copia este archivo a terraform.tfvars y ajusta los valores
+
+# Azure Configuration
+location            = "East US 2"
+resource_group_name = "rg-rancher-server"
+
+# VM Configuration
+prefix       = "rancher"
+vm_size      = "Standard_D2s_v3"  # 2 vCPU, 8GB RAM
+admin_username = "azureuser"
+
+# Rancher Configuration
+rancher_version = "v2.8.3"
+
+# Tags
+tags = {
+  Project     = "Multinube-K8s"
+  Environment = "Production"
+  ManagedBy   = "Terraform"
+  Owner       = "YourName"
+}
