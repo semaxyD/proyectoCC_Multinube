@@ -24,7 +24,13 @@ Este módulo crea una máquina virtual local con VirtualBox y aprovisiona un clu
    choco install vagrant
    ```
 
-3. **Recursos del sistema**:
+3. **Repositorio clonado**:
+   ```powershell
+   git clone https://github.com/semaxyD/proyectoCC_Multinube.git
+   cd proyectoCC_Multinube
+   ```
+
+4. **Recursos del sistema**:
    - Mínimo 4 GB RAM disponibles
    - 2 CPU cores disponibles
    - ~10 GB de espacio en disco
@@ -35,6 +41,7 @@ Este módulo crea una máquina virtual local con VirtualBox y aprovisiona un clu
 
 ```powershell
 # Desde el directorio terraform/local/
+cd terraform/local
 vagrant up
 ```
 

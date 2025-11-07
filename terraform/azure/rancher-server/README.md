@@ -23,6 +23,12 @@ Este módulo de Terraform despliega un servidor Rancher en Azure.
 
 3. **Permisos** para crear recursos en Azure
 
+4. **Repositorio clonado**:
+   ```bash
+   git clone https://github.com/semaxyD/proyectoCC_Multinube.git
+   cd proyectoCC_Multinube
+   ```
+
 ## Uso
 
 ### 1. Inicializar Terraform

@@ -23,6 +23,12 @@ Este módulo de Terraform despliega un cluster Azure Kubernetes Service (AKS).
 
 3. **kubectl** instalado (para administrar el cluster)
 
+4. **Repositorio clonado**:
+   ```bash
+   git clone https://github.com/semaxyD/proyectoCC_Multinube.git
+   cd proyectoCC_Multinube
+   ```
+
 ## Uso
 
 ### 1. Inicializar Terraform
