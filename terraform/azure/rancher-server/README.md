@@ -73,7 +73,25 @@ Outputs disponibles:
    terraform output get_bootstrap_password_command
    # Ejecutar el comando mostrado
    ```
-4. Configurar nueva contraseña (recomendado: `proyectoCCG1`)
+
+   > ⚠️ **Nota importante sobre SSH**: Si vas a conectarte desde Azure CloudShell y ya clonaste el repo allí:
+   > ```bash
+   > # Si estás EN el directorio ssh_keys/:
+   > cd ~/proyectoCC_Multinube/ssh_keys
+   > ssh -i rancher_key.pem azureuser@<IP>
+   > 
+   > # Si estás en el directorio raíz del proyecto:
+   > cd ~/proyectoCC_Multinube
+   > ssh -i ssh_keys/rancher_key.pem azureuser@<IP>
+   > ```
+   > No uses `ssh_keys/rancher_key.pem` si ya estás dentro de `ssh_keys/` - causará error "No such file or directory".
+
+4. Una vez conectado por SSH, obtener el password:
+   ```bash
+   sudo docker logs rancher 2>&1 | grep "Bootstrap Password:"
+   ```
+
+5. Configurar nueva contraseña en Rancher UI (recomendado: `proyectoCCG1`)
 
 ## Variables Disponibles
 

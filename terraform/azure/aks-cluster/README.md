@@ -89,7 +89,7 @@ Las siguientes variables se pueden modificar editando directamente el archivo `v
 | `cluster_name` | Nombre del cluster | `k8s-azure` |
 | `node_count` | Número de nodos | `2` |
 | `node_vm_size` | Tamaño de VMs | `Standard_B2s` |
-| `kubernetes_version` | Versión de K8s | `1.28` |
+| `kubernetes_version` | Versión de K8s | `1.33.5` |
 
 > 💡 **Nota**: Los valores por defecto están optimizados para Azure for Students. Si necesitas cambiarlos, edita `variables.tf` directamente.
 
