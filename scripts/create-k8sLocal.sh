@@ -37,8 +37,16 @@ if ! command -v docker &> /dev/null; then
     sudo systemctl enable docker
     sudo systemctl start docker
     rm get-docker.sh
+    echo "⏳ Esperando que Docker inicie completamente..."
+    sleep 5
 else
     echo "✅ Docker ya instalado"
+fi
+
+# Asegurar que el usuario actual esté en el grupo docker
+if ! groups | grep -q docker; then
+    echo "🔑 Agregando usuario al grupo docker..."
+    sudo usermod -aG docker $USER
 fi
 
 # 4️⃣ Instalar kubectl
@@ -83,12 +91,13 @@ fi
 echo "🚀 Iniciando cluster k8sLocal..."
 # Ejecutar como usuario vagrant (no root) para evitar conflictos con driver docker
 # Usar 2GB de RAM para dejar suficiente overhead al sistema (VM tiene ~3.9GB total)
-minikube start -p k8sLocal \
+# Usar sg para ejecutar con permisos del grupo docker sin necesidad de re-login
+sg docker -c "minikube start -p k8sLocal \
     --driver=docker \
     --cpus=2 \
     --memory=2048 \
     --disk-size=12g \
-    --kubernetes-version=stable
+    --kubernetes-version=stable"
 
 # 2️⃣ Configurar kubectl para usar el contexto k8sLocal
 echo "⚙️  Configurando kubectl..."
