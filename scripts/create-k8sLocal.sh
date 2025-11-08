@@ -83,7 +83,7 @@ echo "🚀 Iniciando cluster k8sLocal..."
 minikube start -p k8sLocal \
     --driver=docker \
     --cpus=2 \
-    --memory=4096 \
+    --memory=3072 \
     --disk-size=12g \
     --kubernetes-version=stable
 
