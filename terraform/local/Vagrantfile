@@ -25,7 +25,8 @@ Vagrant.configure("2") do |config|
   end
 
   # Provisionar con el script de creación de Minikube
-  config.vm.provision "shell", path: "../../scripts/create-k8sLocal.sh"
+  # Ejecutar como usuario vagrant (no root) para compatibilidad con docker driver
+  config.vm.provision "shell", path: "../../scripts/create-k8sLocal.sh", privileged: false
 
   # Mensaje informativo
   config.vm.post_up_message = <<-MSG

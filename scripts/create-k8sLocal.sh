@@ -3,6 +3,7 @@ set -e
 
 # Script de creación de cluster Kubernetes local con Minikube
 # Compatible con Ubuntu 22.04 LTS
+# Ejecutar como usuario normal (no root) para compatibilidad con docker driver
 
 echo "==========================================="
 echo "🔧 Instalación de dependencias para Minikube"
@@ -80,10 +81,12 @@ fi
 
 # 1️⃣ Arrancar el cluster k8sLocal
 echo "🚀 Iniciando cluster k8sLocal..."
+# Ejecutar como usuario vagrant (no root) para evitar conflictos con driver docker
+# Usar 2GB de RAM para dejar suficiente overhead al sistema (VM tiene ~3.9GB total)
 minikube start -p k8sLocal \
     --driver=docker \
     --cpus=2 \
-    --memory=3072 \
+    --memory=2048 \
     --disk-size=12g \
     --kubernetes-version=stable
 
