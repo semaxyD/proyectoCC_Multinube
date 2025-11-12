@@ -253,6 +253,37 @@ kubectl config use-context k8s-azure
 # Ver nodos
 kubectl get nodes -o wide
 ```
+### Configuracion del balanceador de carga en rancher atraves de la UI
+
+Dentro de la UI de rancher nos dirigimos al cluster manager y seleccionamos el cluster donde pondremos el servicio de balanceo, para esta guia se elige k8s-azure ya que es el disponible este momento.
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/358af0c3-ecae-44d8-8a81-54949e87596b" />
+
+Ya adentro se selecciona un nodo. 
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/12972c67-05e5-42ed-b303-d9834583b50e" />
+
+Dentro de de la configuracion del node vamos hacia services dentro del desplegable de services discovery.
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/be83038c-dfe9-4762-b4b5-da6549d15277" />
+
+Luego le damos click a create.
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/e494689f-709f-4d0c-b747-a9edb9e38959" />
+
+Buscamos el tipo de servicio Load Balancer.
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/4897810d-53e6-4205-ab50-68d4518b2b5a" />
+
+En esta interfaz nos dara a elegir el namespace donde queremos el servicio en este caso microstore, le ponemos un nombre al servicio aqui se le puso balanceador y agregamos unos puertos donde para el ejemplo se puso el 80 y el nombre del puerto llamado http. Para la configuracion de ip addres es recomendable poner la ip del balanceador en el rango de la ip del nodo donde se encuentra para el ejemplo fue 192.168.49.1.
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/a4333d68-6b67-4062-a612-feb89f40b6be" />
+
+<img width="1366" height="618" alt="image" src="https://github.com/user-attachments/assets/33a1d3ba-42dc-40c8-9eaa-265d64656a24" />
+
+Nota: el cluster ip y node port se autogeneran, no es necesario poner valores ahi.
+
+ya por ultimo si no quieres realizar modificaciones adicionales debes crear el balanceador dandole al boton de crear. Puedes probar haciendo curl desde la cli hacia la ip del balanceador y el puerto abierto.
 
 ## 🛠️ Comandos Útiles
 
