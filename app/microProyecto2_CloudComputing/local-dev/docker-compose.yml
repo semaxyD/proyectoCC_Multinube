@@ -1,0 +1,96 @@
+version: "3.8"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: myflaskapp
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-net
+
+  users:
+    build: ./microUsers
+    container_name: users
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./microUsers:/app
+    depends_on:
+      - mysql
+    environment:
+      # quitar variables CONSUL_*
+      # aquí pon las variables de conexión a la base de datos u otras que uses
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: root
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  products:
+    build: ./microProducts
+    container_name: products
+    ports:
+      - "5003:5003"
+    volumes:
+      - ./microProducts:/app
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: root
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  orders:
+    build: ./microOrders
+    container_name: orders
+    ports:
+      - "5004:5004"
+    volumes:
+      - ./microOrders:/app
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: root
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - users
+      - products
+      - orders
+      - mysql
+    environment:
+      # Si frontend necesita llamar a microservicios:
+      USERS_URL: http://users:5002
+      PRODUCTS_URL: http://products:5003
+      ORDERS_URL: http://orders:5004
+    restart: unless-stopped
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
