@@ -2,6 +2,8 @@
 
 Proyecto de infraestructura multinube con Kubernetes, gestionado centralmente con Rancher.
 
+> ⚠️ **Nota sobre AWS EKS**: Inicialmente se contempló incluir un cluster EKS de AWS, pero debido a limitaciones de AWS Academy (créditos insuficientes y restricciones de permisos del LabRole que impedían el despliegue de aplicaciones), se decidió excluirlo del proyecto. La infraestructura final consta de **Azure AKS** (nube pública) y **Minikube** (ambiente local), ambos gestionados con Rancher.
+
 ## 🚀 Inicio Rápido
 
 ### Resumen de Pasos Principales
@@ -14,16 +16,13 @@ cd ../aks-cluster && terraform init && terraform apply
 # 2. Crear VM local con Vagrant
 cd ../../local && vagrant up
 
-# 3. Crear cluster EKS manualmente en AWS Console
-# Ver guía: aws-manual/eks-setup-guide.md
-
-# 4. Configurar Rancher y registrar clusters desde UI
+# 3. Configurar Rancher y registrar clusters desde UI
 # Rancher UI → Import Existing → Copiar comando → Ejecutar en cada cluster
 ```
 
-> 📖 **Ver guía completa paso a paso**: [`QUICK_START.md`](./QUICK_START.md) (~45-55 minutos total)
+> 📖 **Ver guía completa paso a paso**: [`QUICK_START.md`](./QUICK_START.md) (~30-35 minutos total)
 > 
-> 💡 **Nota**: Los pasos 3 y 4 son manuales. Ver secciones detalladas abajo para cada uno.
+> 💡 **Nota**: El paso 3 es manual. Ver secciones detalladas abajo.
 
 ---
 
@@ -34,21 +33,19 @@ cd ../../local && vagrant up
 1. **Rancher Server** (Azure)
    - Panel de gestión centralizado
    - Versión: v2.8.3
-   - Gestiona clusters de múltiples nubes
+   - Gestiona clusters de Azure y Local
 
 2. **Cluster AKS** (Azure Kubernetes Service)
    - 2 nodos `Standard_B2s`
    - Ubuntu 22.04 LTS
    - Integrado con Azure Monitor
+   - Aplicación MicroStore desplegada
 
-3. **Cluster EKS** (AWS Elastic Kubernetes Service)
-   - 2 nodos `t3.medium`
-   - Amazon Linux 2 / Ubuntu 22.04 LTS
-   - Creación manual (limitaciones AWS Academy)
-
-4. **Cluster Local** (Minikube)
+3. **Cluster Local** (Minikube)
    - Entorno de desarrollo local
-   - 2 vCPU, 4GB RAM mínimo
+   - 2 vCPU, 4GB RAM
+   - Desplegado en VM Ubuntu 22.04 con Vagrant
+   - Aplicación MicroStore desplegada
 
 ## 📁 Estructura del Proyecto
 
@@ -62,40 +59,43 @@ cd ../../local && vagrant up
 │       ├── Vagrantfile          # Configuración VM VirtualBox
 │       └── README.md
 ├── scripts/                      # Scripts manuales de ayuda
-│   ├── rancher-setup.sh         # Instalación Rancher (MANUAL)
+│   ├── rancher-setup.sh         # Instalación Rancher (usado por Terraform)
 │   ├── create-k8sLocal.sh       # Creación cluster local (usado por Vagrant)
 │   └── register-cluster.sh      # Registro de clusters (MANUAL)
-├── aws-manual/                   # Documentación AWS EKS (MANUAL)
-│   └── eks-setup-guide.md       # Guía paso a paso
+├── app/                          # Aplicación MicroStore
+│   └── microProyecto2_CloudComputing/
+│       ├── microUsers/          # Microservicio de usuarios
+│       ├── microProducts/       # Microservicio de productos
+│       ├── microOrders/         # Microservicio de órdenes
+│       ├── frontend/            # Frontend web
+│       └── k8s/                 # Manifiestos Kubernetes
 └── docs/                         # Documentación adicional
     └── troubleshooting.md
 ```
 
-### � ¿Qué es automático y qué es manual?
+### ⚙️ ¿Qué es automático y qué es manual?
 
 | Componente | Método | Automatización |
 |-----------|--------|----------------|
 | **Rancher Server** | Terraform + cloud-init | ✅ Totalmente automático |
 | **AKS Cluster** | Terraform | ✅ Totalmente automático |
-| **EKS Cluster** | AWS Console | ❌ Manual (limitación AWS Academy) |
 | **VM Local (Vagrant)** | Vagrant + script | ✅ Automático con `vagrant up` |
-| **Registro en Rancher** | UI de rancher | ❌ Manual (mas simple que consumir API de rancher via script) |
+| **Registro en Rancher** | UI de Rancher | ❌ Manual (más simple que API) |
+| **Despliegue App** | kubectl + manifiestos | ❌ Manual (ver guías específicas) |
 
-## �🚀 Requisitos Previos
+## 🚀 Requisitos Previos
 
 ### Herramientas Necesarias
 
 - [Terraform](https://www.terraform.io/downloads) >= 1.0
 - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
-- [AWS CLI](https://aws.amazon.com/cli/) (para EKS manual)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [VirtualBox](https://www.virtualbox.org/) + [Vagrant](https://www.vagrantup.com/) (para cluster local)
 
 ### Credenciales
 
-- **Azure**: Suscripción activa (Azure for Students)
-- **AWS**: Cuenta AWS Academy
-- **Local**: VirtualBox instalado
+- **Azure**: Suscripción activa (Azure for Students - $100 crédito)
+- **Local**: VirtualBox instalado (gratis)
 
 ## 📋 Guía de Despliegue
 
@@ -182,23 +182,9 @@ kubectl get pods -n cattle-system
 
 ---
 
-### Paso 4: Cluster EKS (Manual)
+### Paso 4: Cluster Local con Vagrant + Minikube
 
-> ⚠️ **Importante**: Debido a limitaciones de AWS Academy (no permite uso de Terraform con LabRole), el cluster EKS debe crearse **manualmente** desde la consola de AWS.
-
-Ver guía detallada en: [`aws-manual/eks-setup-guide.md`](./aws-manual/eks-setup-guide.md)
-
-**Resumen:**
-1. Usar "Configuración rápida con modo automático" en AWS Console
-2. EKS crea automáticamente los node groups (no requiere configuración manual)
-3. Configurar kubectl: `aws eks update-kubeconfig --name rancher-eks-cluster --region us-east-1`
-4. Registrar en Rancher usando el **mismo proceso del Paso 3** (UI + comando)
-
----
-
-### Paso 5: Cluster Local con Vagrant + Minikube
-
-#### 5.1 Crear VM y cluster
+#### 4.1 Crear VM y cluster
 
 > ℹ️ **Automatizado con Vagrant**: El script `create-k8sLocal.sh` se ejecuta automáticamente.
 
@@ -211,7 +197,7 @@ vagrant up
 vagrant ssh -c "kubectl get nodes"
 ```
 
-#### 5.2 Registrar en Rancher
+#### 4.2 Registrar en Rancher
 
 1. Acceder a Rancher UI: `https://<RANCHER_IP>`
 2. **Clusters** → **Import Existing** → **Generic**
@@ -312,16 +298,17 @@ kubectl logs -f <pod-name> -n cattle-system
 ### 🔧 Configuración Manual
 
 - [ ] **Configurar Rancher**: Acceder a `https://<RANCHER_IP>`, obtener bootstrap password, configurar password permanente
-- [ ] **Crear EKS**: Seguir guía en `aws-manual/eks-setup-guide.md` (modo automático de AWS)
 - [ ] **Registrar AKS en Rancher**: UI → Import → Ejecutar comando en AKS
-- [ ] **Registrar EKS en Rancher**: UI → Import → Ejecutar comando en CloudShell
 - [ ] **Registrar k8sLocal en Rancher**: UI → Import → Ejecutar comando en VM
+- [ ] **Desplegar Aplicación MicroStore**: Ver guías en `app/microProyecto2_CloudComputing/`
 
 ### ✔️ Verificación
 
-- [ ] Todos los clusters aparecen como **Active** en Rancher UI
+- [ ] Ambos clusters (AKS y k8sLocal) aparecen como **Active** en Rancher UI
 - [ ] Todos los nodos muestran estado **Ready**
 - [ ] Pods de `cattle-system` están **Running** en cada cluster
+- [ ] Aplicación accesible en AKS: `http://20.15.66.143/`
+- [ ] Aplicación accesible localmente: `http://192.168.56.10/`
 
 ---
 
@@ -337,33 +324,29 @@ Ver guía completa en: [`docs/troubleshooting.md`](./docs/troubleshooting.md)
 
 ## 📚 Documentación Adicional
 
-### Guías Paso a Paso
+### Guías de Infraestructura
 
-- 📖 [Guía de Inicio Rápido](./docs/quick-start.md) - Despliega todo en 30 minutos
-- ✅ [Checklist de Deployment](./docs/deployment-checklist.md) - Checklist completo paso a paso
-- 🔧 [Guía de Troubleshooting](./docs/troubleshooting.md) - Solución de problemas comunes
-- 📋 [Comandos Útiles](./docs/commands-cheatsheet.md) - Cheat sheet de comandos
+- 📖 [Guía de Inicio Rápido](./QUICK_START.md) - Despliega infraestructura en 30 minutos
+- 🔧 [Rancher Server - README](./terraform/azure/rancher-server/README.md) - Despliegue de Rancher
+- ☸️ [AKS Cluster - README](./terraform/azure/aks-cluster/README.md) - Despliegue de AKS
+- �️ [Local Cluster - README](./terraform/local/README.md) - Despliegue con Vagrant
+- 📋 [Scripts - README](./scripts/README.md) - Documentación de scripts
 
-### Documentación Técnica
+### Guías de Aplicación
 
-- 🏗️ [Estructura del Proyecto](./docs/project-structure.md) - Organización de archivos
-- 🚀 [Mejoras Futuras](./docs/future-improvements.md) - Optimizaciones propuestas
-- 🔐 [Guía de EKS](./aws-manual/eks-setup-guide.md) - Creación manual de cluster AWS
-
-### Documentación de Módulos
-
-- [Rancher Server - README](./terraform/azure/rancher-server/README.md)
-- [AKS Cluster - README](./terraform/azure/aks-cluster/README.md)
-- [Scripts - README](./scripts/README.md)
+- 🏪 [MicroStore - README](./app/microProyecto2_CloudComputing/README.md) - Aplicación de microservicios
+- ☁️ [Despliegue en AKS](./DEPLOYMENT-AZURE-AKS.md) - Guía paso a paso para Azure
+- 💻 [Despliegue Local](./DEPLOYMENT-LOCAL-MINIKUBE.md) - Guía paso a paso para Minikube
 
 ## 📚 Referencias Externas
 
 - [Rancher Documentation](https://rancher.com/docs/)
 - [Azure AKS Documentation](https://docs.microsoft.com/azure/aks/)
-- [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
 - [Minikube Documentation](https://minikube.sigs.k8s.io/docs/)
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
-- [Terraform Best Practices](https://www.terraform-best-practices.com/)
+- [Flask Documentation](https://flask.palletsprojects.com/)
+- [MySQL on Kubernetes](https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/)
 
 ## 🤝 Contribución
 

@@ -2,12 +2,13 @@
 
 ## 🚀 Resumen Ejecutivo
 
-Este proyecto despliega una infraestructura multinube Kubernetes con 4 componentes:
+Este proyecto despliega una infraestructura multinube Kubernetes con 3 componentes:
 
 1. **Rancher Server** (Azure) - Panel de gestión centralizado
-2. **Cluster AKS** (Azure) - Cluster Kubernetes gestionado
-3. **Cluster EKS** (AWS) - Cluster Kubernetes gestionado
-4. **Cluster Local** (VM con Minikube) - Entorno de desarrollo
+2. **Cluster AKS** (Azure) - Cluster Kubernetes gestionado en la nube
+3. **Cluster Local** (VM con Minikube) - Entorno de desarrollo local
+
+> ⚠️ **Nota sobre AWS**: Inicialmente se contempló AWS EKS, pero se excluyó debido a limitaciones de AWS Academy (créditos insuficientes y restricciones de permisos para desplegar aplicaciones).
 
 ---
 
@@ -57,31 +58,14 @@ vagrant up
 
 ---
 
-### 3️⃣ Crear Cluster EKS (Manual)
+### 3️⃣ Registrar Clusters en Rancher (Manual)
 
-Seguir guía completa: [`aws-manual/eks-setup-guide.md`](./aws-manual/eks-setup-guide.md)
-
-**Resumen**:
-1. AWS Console → EKS → Create Cluster
-2. Usar "Configuración rápida con modo automático"
-3. EKS crea automáticamente los node groups
-4. Configurar kubectl:
-   ```bash
-   aws eks update-kubeconfig --name rancher-eks-cluster --region us-east-1
-   ```
-
-**Tiempo estimado**: 10-15 minutos
-
----
-
-### 4️⃣ Registrar Clusters en Rancher (Manual)
-
-**Proceso idéntico para todos los clusters (AKS, EKS, Local)**:
+**Proceso idéntico para ambos clusters (AKS y Local)**:
 
 #### Paso 1: Desde Rancher UI
 1. Acceder a `https://<RANCHER_IP>`
 2. **Clusters** → **Import Existing** → **Generic**
-3. Nombrar el cluster (ej: `k8s-azure`, `rancher-eks-cluster`, `k8sLocal`)
+3. Nombrar el cluster (ej: `k8s-azure`, `k8sLocal`)
 4. Click **Create**
 5. Copiar comando proporcionado
 
@@ -90,12 +74,6 @@ Seguir guía completa: [`aws-manual/eks-setup-guide.md`](./aws-manual/eks-setup-
 **Para AKS**:
 ```bash
 az aks get-credentials -g rg-k8s-azure -n k8s-azure
-curl --insecure -sfL https://<RANCHER_IP>/v3/import/<TOKEN>.yaml | kubectl apply -f -
-```
-
-**Para EKS**:
-```bash
-aws eks update-kubeconfig --name rancher-eks-cluster --region us-east-1
 curl --insecure -sfL https://<RANCHER_IP>/v3/import/<TOKEN>.yaml | kubectl apply -f -
 ```
 
@@ -113,7 +91,7 @@ kubectl get pods -n cattle-system
 
 El cluster debe aparecer como **Active** en Rancher UI en 2-3 minutos.
 
-**Tiempo estimado**: 5 minutos por cluster
+**Tiempo estimado**: 5 minutos por cluster (10 minutos total)
 
 ---
 
@@ -126,13 +104,11 @@ El cluster debe aparecer como **Active** en Rancher UI en 2-3 minutos.
 
 ### Configuración Manual
 - [ ] Rancher configurado (password permanente)
-- [ ] Cluster EKS creado en AWS Console
 - [ ] AKS registrado en Rancher
-- [ ] EKS registrado en Rancher
 - [ ] k8sLocal registrado en Rancher
 
 ### Verificación Final
-- [ ] Los 4 clusters aparecen como **Active** en Rancher UI
+- [ ] Los 2 clusters aparecen como **Active** en Rancher UI
 - [ ] Todos los nodos muestran estado **Ready**
 - [ ] Pods de `cattle-system` están **Running** en cada cluster
 
@@ -144,9 +120,8 @@ El cluster debe aparecer como **Active** en Rancher UI en 2-3 minutos.
 |-------|--------|
 | Aprovisionamiento automático | 15-20 min |
 | Configuración Rancher | 5 min |
-| Creación EKS | 10-15 min |
-| Registro clusters | 15 min |
-| **TOTAL** | **45-55 minutos** |
+| Registro clusters | 10 min |
+| **TOTAL** | **30-35 minutos** |
 
 ---
 
@@ -161,9 +136,7 @@ El cluster debe aparecer como **Active** en Rancher UI en 2-3 minutos.
 ❌ **NO** configurar networking - Terraform lo configura automáticamente
 
 
-✅ **SÍ** crear cluster EKS manualmente (limitación AWS Academy)
-
-✅ **SÍ** registrar clusters desde Rancher UI (mismo proceso para todos)
+✅ **SÍ** registrar clusters desde Rancher UI (mismo proceso para ambos)
 
 
 ---
@@ -171,10 +144,10 @@ El cluster debe aparecer como **Active** en Rancher UI en 2-3 minutos.
 ## 📚 Documentación Detallada
 
 - [README Principal](./README.md) - Documentación completa
-- [Guía EKS](./aws-manual/eks-setup-guide.md) - Creación paso a paso de EKS
 - [Scripts README](./scripts/README.md) - Detalles de scripts automáticos
-- [Troubleshooting](./docs/troubleshooting.md) - Solución de problemas
+- [Despliegue en AKS](./DEPLOYMENT-AZURE-AKS.md) - Guía de aplicación MicroStore en Azure
+- [Despliegue Local](./DEPLOYMENT-LOCAL-MINIKUBE.md) - Guía de aplicación MicroStore en Minikube
 
 ---
 
-**Última actualización**: Noviembre 2025
+**Última actualización**: Noviembre 12, 2025
